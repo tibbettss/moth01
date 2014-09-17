@@ -1,0 +1,25 @@
+## Copyright (c) 2014 Mimetics Inc.
+## All Rights Reserved
+##
+## THIS SOFTWARE IS PROVIDED BY MIMETICS "AS IS" WITHOUT ANY EXPRESSED OR 
+## IMPLIED WARRANTIES.  IN NO CASE SHALL MIMETICS OR ANY CONTRIBUTORS BE
+## LIABLE IN ANY DAMAGES CAUSED BY THE USE OF THIS SOFTWARE.  
+##
+## FileName: lyttst01.panel
+## Version : 01.0
+##
+## Author  : Myke Predko
+##
+## Description:
+##   - Display Light Values as sliders
+##
+## Release History:
+##   - August 30, 2014, created for "lyttst01.script" as part of 
+##      "zzzMFG01.script" (Manufacturing Test)
+
+dimensions = 102, 53;
+background = movBACKG.bmp;
+
+slider     = leftFront,             0,   29,  5,  10, 28,   show, north;
+slider     = rightFront,            0,   62,  5,  10, 28,   show, north;
+slider     = rearMiddle,            0,   45, 23,  10, 28,   show, south;

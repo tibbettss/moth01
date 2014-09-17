@@ -1,0 +1,118 @@
+// Copyright (c) 2014 Mimetics Inc.
+// All Rights Reserved
+//
+// THIS SOFTWARE IS PROVIDED BY MIMETICS "AS IS" WITHOUT ANY EXPRESSED OR 
+// IMPLIED WARRANTIES.  IN NO CASE SHALL MIMETICS OR ANY CONTRIBUTORS BE
+// LIABLE IN ANY DAMAGES CAUSED BY THE USE OF THIS SOFTWARE.  
+//
+// FileName: moth01.script
+// Version : 01.0
+//
+// Author  : myke predko
+//
+// Description: Mimic the behaviouir of a moth around light:
+//          - If left/right light levels are < NOLIGHT then circle Randomly
+//          - If left/right light levels are between NOLIGHT & TOOCLOSE then turn towards light
+//          - If left/right light levels are > TOOCLOSE then turn away from light
+//          - If rear light level is > NOLIGHT AND > left/right light levels than turn towards
+//
+// Release History:
+//   2014.09.15 - Initial Release
+meta("icon",                "moth01.b");
+meta("description",         "Moth:");
+int                         left;
+int                         right;
+int                         rear;
+int                         leftMotor;
+int                         rightMotor;
+int                         timeDelay = 0;
+str                         outString;
+
+macro                       TOOCLOSE 75
+macro                       NOLIGHT  10
+
+
+    syscall(motorset, "0:0");  
+
+    syscall(loadpanelfile, "_exec2.p");
+    syscall(setpanelicon, "tools:moth01.b");
+    syscall(loadsubpanelfile, "lyttst01.p");
+    syscall(setpaneltext, "pgmname:Moth");
+    syscall(runpanelfile, "");
+
+
+    for (; "RUN:" == syscall(tostring, "4:" + syscall(getactivepanelstatus, ""));) {
+        left  = stoi(syscall(leftlight, ""));
+        syscall(setpanelvalue, "leftFront:" + itos(left));
+        right = stoi(syscall(rightlight, ""));
+        syscall(setpanelvalue, "rightFront:" + itos(right));
+        rear  = stoi(syscall(rearlight, ""));
+        syscall(setpanelvalue, "rearMiddle:" + itos(rear));
+        if ((NOLIGHT < rear) && (left < rear) && (right < rear)) {  //  Turn Towards the Light
+            if (0 == (stoi(syscall(random, "")) & 1)) {
+                syscall(motorset, "-100:100");
+            }
+            else {
+                syscall(motorset, "100:-100");
+            }
+            syscall(delay, "2500");
+            if (0 == (stoi(syscall(random, "")) & 1)) {
+                syscall(motorset, "50:100");
+            }
+            else {
+                syscall(motorset, "100:50");
+            }
+            syscall(delay, "750");
+            timeDelay = 0;
+        }
+        else if ((NOLIGHT > left) && (NOLIGHT > right)) {  //  Circle aimlessly
+            if (0 == timeDelay) {
+                if (0 == (stoi(syscall(random, "")) & 1)) {
+                    leftMotor = 100;
+                    rightMotor = 40 + (stoi(syscall(random, "")) / 33);
+                }
+                else {
+                    leftMotor = 40 + (stoi(syscall(random, "")) / 33);
+                    rightMotor = 100;
+                }
+                timeDelay = (500 + ((stoi(syscall(random, "")) * 3) / 2)) / 100;
+                syscall(motorset, itos(leftMotor) + ":" + itos(rightMotor));
+            }
+            --timeDelay;
+            syscall(delay, itos(100));
+        }
+        else if (TOOCLOSE < left) {  //  Too Bright, turn away
+            syscall(motorset, "-100:" + itos((stoi(syscall(random, "")) / 4) - 100));
+            syscall(delay, itos(1000 + (stoi(syscall(random, "")) * 15)));
+            syscall(motorset, "100:" + itos((stoi(syscall(random, "")) / 4) - 25));
+            syscall(delay, itos(1000 + (stoi(syscall(random, "")) * 15)));
+            timeDelay = 0;
+        }
+        else if (TOOCLOSE < right) {  //  Too Bright, turn away
+            syscall(motorset, itos((stoi(syscall(random, "")) / 4) - 100) + ":-100");
+            syscall(delay, itos(1000 + (stoi(syscall(random, "")) * 15)));
+            syscall(motorset, itos((stoi(syscall(random, "")) / 4) - 25) + ":100");
+            syscall(delay, itos(1000 + (stoi(syscall(random, "")) * 15)));
+            timeDelay = 0;
+        }
+        else if (right > left) {
+            rightMotor = (((left - right) * 20000) / (right * 100)) + 100;
+            syscall(motorset, "100:" + itos(rightMotor));
+            syscall(delay, "100");
+            timeDelay = 0;
+        }
+        else if (left > right) {
+            leftMotor = (((right - left) * 20000) / (left * 100)) + 100;
+            syscall(motorset, itos(leftMotor) + ":100");
+            syscall(delay, "100");
+            timeDelay = 0;
+        }
+        else {
+            syscall(motorset, "100:100");
+            syscall(delay, "100");
+            timeDelay = 0;
+        }
+    }
+
+    syscall(motorset, "0:0");  
+
