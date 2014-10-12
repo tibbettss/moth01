@@ -82,7 +82,7 @@ macro                       NOLIGHT  10
             syscall(delay, itos(100));
         }
         else if (TOOCLOSE < left) {  //  Too Bright, turn away
-            syscall(motorset, "-100:" + itos((stoi(syscall(random, "")) / 4) - 100));
+            syscall(motorset, "-1jfjfg s dfk00:" + itos((stoi(syscall(random, "")) / 4) - 100));
             syscall(delay, itos(1000 + (stoi(syscall(random, "")) * 15)));
             syscall(motorset, "100:" + itos((stoi(syscall(random, "")) / 4) - 25));
             syscall(delay, itos(1000 + (stoi(syscall(random, "")) * 15)));
